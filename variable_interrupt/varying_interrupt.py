@@ -9,9 +9,8 @@ sim_kernel = "/bin/sleep"
 tot_sim_tasks = 10
 sim_arg = 50
 
-#ana_min_exec_time = 1
-#ana_max_exec_time = 3
-ana_exec_time = 1
+ana_min_exec_time = 5
+ana_max_exec_time = 10
 ana_tot_duration = 50
 
 if __name__ == '__main__':
@@ -23,7 +22,7 @@ if __name__ == '__main__':
 
 
 	assert ana_tot_duration <= sim_arg
-	assert ana_exec_time <= ana_tot_duration
+	assert ana_max_exec_time <= ana_tot_duration
 
 	# Start first set of N tasks
 	for i in range(tot_sim_tasks):
@@ -49,8 +48,7 @@ if __name__ == '__main__':
 	while( (len(proc_list) is not 0) and (exec_time_cnt<=ana_tot_duration)):
 
 		# Sleep for a random time
-		#exec_time = randint(ana_min_exec_time,ana_max_exec_time)
-		exec_time = ana_exec_time
+		exec_time = randint(ana_min_exec_time,ana_max_exec_time)
 		time.sleep(exec_time)
 		exec_time_cnt += exec_time
 
@@ -87,15 +85,17 @@ if __name__ == '__main__':
 
 	title = "pid, Interrupt, Started, Terminated, Done"
 
-	f1 = open("execution_profile_nsims_{0}_simdur_{3}_anaexec_{1}_anatotdur_{2}.csv".format(tot_sim_tasks,
-		ana_exec_time,
+	f1 = open("execution_profile_nsims_{0}_simdur_{3}_anaexec_{1}-{4}_anatotdur_{2}.csv".format(tot_sim_tasks,
+		ana_min_exec_time,
 		ana_tot_duration,
-		sim_arg),
+		sim_arg,
+		ana_max_exec_time),
 	'w')
 
 	f1.write("total no. of sims = {0} \n".format(tot_sim_tasks))
 	f1.write("sim duration = {0} \n".format(sim_arg))
-	f1.write("ana exec time = {0} \n".format(ana_exec_time))
+	f1.write("ana max exec time = {0} \n".format(ana_max_exec_time))
+	f1.write("ana min exec time = {0} \n".format(ana_min_exec_time))
 	f1.write("ana tot duration = {0} \n".format(ana_tot_duration))
 
 	f1.write("\n"+ title + "\n\n")
