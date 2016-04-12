@@ -8,12 +8,12 @@ import uuid
 
 sim_kernel = "/bin/sleep"
 tot_sim_tasks = 10
-sim_arg = 10
+sim_arg = 50
 
 #ana_min_exec_time = 1
 #ana_max_exec_time = 3
 ana_exec_time = 1
-ana_tot_duration = 10
+ana_tot_duration = 50
 
 if __name__ == '__main__':
 
@@ -63,6 +63,7 @@ if __name__ == '__main__':
 			proc.terminate()
 			# Record time process is Terminated
 			proc_info[proc.pid]['Terminated'] = time.time()
+			proc_info[proc.pid]['Interrupt'] = exec_time_cnt
 			proc_list.remove(proc)
 			
 		#print 'Terminated: ', proc.pid, ': ', proc_info[proc.pid]
@@ -81,11 +82,11 @@ if __name__ == '__main__':
 
 	
 	# Pretty print
-	pprint.pprint(proc_info)
+	#pprint.pprint(proc_info)
 
 	# Write proc info record to file
 
-	title = "pid, Started, Terminated, Done"
+	title = "pid, Interrupt, Started, Terminated, Done"
 
 	f1 = open("execution_profile_nsims_{0}_simdur_{3}_anaexec_{1}_anatotdur_{2}.csv".format(tot_sim_tasks,
 		ana_exec_time,
@@ -103,11 +104,11 @@ if __name__ == '__main__':
 	for pid, vals in proc_info.iteritems():
 
 		if "Terminated" in vals.keys():
-			line = "{0}, {1}, {2}, None\n".format(pid, vals["Started"],vals["Terminated"])
+			line = "{0}, {1}, {2:0.5f}, {3:0.5f}, None\n".format(pid, vals["Interrupt"], vals["Started"],vals["Terminated"])
 			f1.write(line)
 
 		elif "Done" in vals.keys():
-			line = "{0}, {1}, None, {2}\n".format(pid, vals["Started"],vals["Done"])
+			line = "{0}, None, {1:0.5f}, None, {2:0.5f}\n".format(pid, vals["Started"],vals["Done"])
 			f1.write(line)
 
 	f1.close()

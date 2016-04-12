@@ -5,7 +5,7 @@ if __name__ == "__main__":
 
 	nsims = 10
 	sim_arg = 50
-	ana_exec_time = 5
+	ana_exec_time = 1
 	ana_tot_duration = 50
 
 	# Read given CSV
@@ -23,14 +23,21 @@ if __name__ == "__main__":
 	req_df = pd.DataFrame(columns=["Executing","Terminated","Done"])
 	req_df.loc["0"] = [nsims,0,0]
 
-	iter=0
+	#print df[df.Interrupt < 2]
+	#print df[df.Interrupt<="2"]
+
+	terminated=0
 	#print df[:1][" Started"]
 	
 	for t in range(ana_exec_time, ana_tot_duration, ana_exec_time):
-		terminated = len(df[df.Interrupt<="{0}".format(t)])
+		#print t
+		#terminated = len(df[df.Interrupt<="{0}".format(t)])
+		terminated = len(df[df.Interrupt<=t])
 		executing = nsims - terminated
 		#print executing
 		req_df.loc["{0}".format(t)] = [executing, terminated,0]
+		if terminated == nsims:
+			break
 		#iter+=1
 
 	req_df.loc["{0}".format(sim_arg)] = [0,terminated,nsims-terminated]	
@@ -42,5 +49,5 @@ if __name__ == "__main__":
 
 	fig = plt.gcf()
 	fig.set_size_inches(16,6)
-	fig.savefig('plot_interrupt_{0}.png'.format(ana_exec_time), dpi=100)
+	fig.savefig('plots/plot_interrupt_{0}.png'.format(ana_exec_time), dpi=100)
 	
