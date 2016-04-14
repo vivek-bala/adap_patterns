@@ -2,7 +2,6 @@ import subprocess as sp
 from random import randint
 import time
 import pprint
-import uuid
 
 
 sim_kernel = "/bin/sleep"
@@ -58,7 +57,7 @@ if __name__ == '__main__':
 			proc.terminate()
 			# Record time process is Terminated
 			proc_info[proc.pid]['Terminated'] = time.time()
-			proc_info[proc.pid]['Interrupt'] = exec_time_cnt
+			proc_info[proc.pid]['Interrupt'] = interrupt_time_cnt
 			proc_list.remove(proc)
 			
 		#print 'Terminated: ', proc.pid, ': ', proc_info[proc.pid]
