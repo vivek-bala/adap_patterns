@@ -9,21 +9,18 @@ sim_kernel = "/bin/sleep"
 tot_sim_tasks = 10
 sim_arg = 50
 
-#ana_min_exec_time = 1
-#ana_max_exec_time = 3
-ana_exec_time = 1
-ana_tot_duration = 50
+interrupt_time_period = 1
+interrupt_total_duration = 50
 
 if __name__ == '__main__':
 
 	proc_list = []
 	out_list = []
-
 	proc_info = dict()
 
-
-	assert ana_tot_duration <= sim_arg
-	assert ana_exec_time <= ana_tot_duration
+	# Sanity check
+	assert interrupt_total_duration <= sim_arg
+	assert interrupt_time_period <= interrupt_total_duration
 
 	# Start first set of N tasks
 	for i in range(tot_sim_tasks):
@@ -43,16 +40,15 @@ if __name__ == '__main__':
 
 	
 	# "Analysis"
-	exec_time_cnt = 0
+	interrupt_time_cnt = 0
 
 	# Interrupt till all processes haven't finished AND total time is less than max exec time
-	while( (len(proc_list) is not 0) and (exec_time_cnt<=ana_tot_duration)):
+	while( (len(proc_list) is not 0) and (interrupt_time_cnt<=interrupt_total_duration)):
 
 		# Sleep for a random time
-		#exec_time = randint(ana_min_exec_time,ana_max_exec_time)
-		exec_time = ana_exec_time
-		time.sleep(exec_time)
-		exec_time_cnt += exec_time
+		interrupt_time= interrupt_time_period
+		time.sleep(interrupt_time)
+		interrupt_time_cnt += interrupt_time
 
 		#Pick a particular process - terminate if it is alive
 		proc = proc_list[randint(0,len(proc_list)-1)]
@@ -88,15 +84,15 @@ if __name__ == '__main__':
 	title = "pid, Interrupt, Started, Terminated, Done"
 
 	f1 = open("execution_profile_nsims_{0}_simdur_{3}_anaexec_{1}_anatotdur_{2}.csv".format(tot_sim_tasks,
-		ana_exec_time,
-		ana_tot_duration,
+		interrupt_time_period,
+		interrupt_total_duration,
 		sim_arg),
 	'w')
 
 	f1.write("total no. of sims = {0} \n".format(tot_sim_tasks))
 	f1.write("sim duration = {0} \n".format(sim_arg))
-	f1.write("ana exec time = {0} \n".format(ana_exec_time))
-	f1.write("ana tot duration = {0} \n".format(ana_tot_duration))
+	f1.write("interrupt time period= {0} \n".format(interrupt_time_period))
+	f1.write("interrupt_total_duration = {0} \n".format(interrupt_total_duration))
 
 	f1.write("\n"+ title + "\n\n")
 
