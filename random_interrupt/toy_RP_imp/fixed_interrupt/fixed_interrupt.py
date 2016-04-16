@@ -104,7 +104,7 @@ if __name__ == "__main__":
 	interrupt_time_cnt = 0
 
 	# Interrupt till all processes haven't finished AND total time is less than max exec time
-	while( (len(units) is not 0) and (interrupt_time_cnt<=math.ceil(tot_sim_tasks/pilot.description["cores"])*interrupt_total_duration)):
+	while( (len(units) is not 0) and (interrupt_time_cnt<=int(math.ceil(tot_sim_tasks/pilot.description["cores"]))*interrupt_total_duration - 1)):
 
 		# Sleep for a random time
 		interrupt_time= interrupt_time_period
@@ -141,3 +141,32 @@ if __name__ == "__main__":
 
 	# Pretty print
 	pprint.pprint(unit_info)
+
+	# Write proc info record to file
+
+	title = "pid, Interrupt, Started, Terminated, Done"
+
+	f1 = open("execution_profile_nsims_{0}_simdur_{3}_anaexec_{1}_anatotdur_{2}.csv".format(tot_sim_tasks,
+		interrupt_time_period,
+		interrupt_total_duration,
+		sim_arg),
+	'w')
+
+	f1.write("total no. of sims = {0} \n".format(tot_sim_tasks))
+	f1.write("sim duration = {0} \n".format(sim_arg))
+	f1.write("interrupt time period= {0} \n".format(interrupt_time_period))
+	f1.write("interrupt_total_duration = {0} \n".format(interrupt_total_duration))
+
+	f1.write("\n"+ title + "\n\n")
+
+	for pid, vals in proc_info.iteritems():
+
+		if "Terminated" in vals.keys():
+			line = "{0}, {1}, {2:0.5f}, {3:0.5f}, None\n".format(pid, vals["Interrupt"], vals["Started"],vals["Terminated"])
+			f1.write(line)
+
+		elif "Done" in vals.keys():
+			line = "{0}, None, {1:0.5f}, None, {2:0.5f}\n".format(pid, vals["Started"],vals["Done"])
+			f1.write(line)
+
+	f1.close()
