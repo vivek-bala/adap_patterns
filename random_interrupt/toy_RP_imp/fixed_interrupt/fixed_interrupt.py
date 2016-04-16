@@ -8,10 +8,10 @@ import pprint
 
 sim_kernel = "/bin/sleep"
 tot_sim_tasks = 12
-sim_arg = 5
+sim_arg = 50
 
-interrupt_time_period = 1
-interrupt_total_duration = 5
+interrupt_time_period = 10
+interrupt_total_duration = 50
 
 unit_info = dict()
 
@@ -25,8 +25,8 @@ def pilot_state_cb (pilot, state) :
 	if state == rp.DONE:
 		print "Pilot DONE"
 
-            	if state == rp.CANCELED:
-                	print "Pilot CANCELED"
+	if state == rp.CANCELED:
+		print "Pilot CANCELED"
 
 
 def unit_state_cb (unit, state) :
@@ -43,6 +43,10 @@ def unit_state_cb (unit, state) :
 
 	if state == rp.DONE:
 		unit_info[unit.uid]['Done'] = time.time()
+
+	if state == rp.CANCELED:
+		unit_info[unit.uid]['Terminated'] = time.time()
+		print "Terminated unit: {0}".format(unit.uid)
 
 if __name__ == "__main__":
 
@@ -122,9 +126,8 @@ if __name__ == "__main__":
 
 			if candidate_unit.state == "Executing":
 				candidate_unit.cancel()
-				unit_info[candidate_unit.uid]["Terminated"] = time.time()
+				#unit_info[candidate_unit.uid]["Terminated"] = time.time()
 				unit_info[candidate_unit.uid]["Interrupt"] = interrupt_time_cnt
-				print "Terminated unit: {0}".format(candidate_unit.uid)
 				units.remove(candidate_unit)
 
 		# Remove units already completed
@@ -159,7 +162,7 @@ if __name__ == "__main__":
 
 	f1.write("\n"+ title + "\n\n")
 
-	for pid, vals in proc_info.iteritems():
+	for pid, vals in unit_info.iteritems():
 
 		if "Terminated" in vals.keys():
 			line = "{0}, {1}, {2:0.5f}, {3:0.5f}, None\n".format(pid, vals["Interrupt"], vals["Started"],vals["Terminated"])
