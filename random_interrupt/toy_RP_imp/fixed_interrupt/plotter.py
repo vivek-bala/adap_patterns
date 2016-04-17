@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 if __name__ == "__main__":
 
 	nsims = 12
-	sim_arg = 5
-	ana_exec_time = 1
-	ana_tot_duration = 5
+	sim_arg = 50
+	ana_exec_time = 10
+	ana_tot_duration = 50
 	cores = 4
 
 	# Read given CSV
@@ -19,8 +19,9 @@ if __name__ == "__main__":
 	#print df
 	#print df[df.Interrupt<="20"].count()
 
-	# Construct required DF
 	'''
+	# Construct required DF
+	# Plot with interrupt as x-axis
 	req_df = pd.DataFrame(columns=["Executing","Terminated","Done"])
 	req_df.loc["0"] = [nsims,0,0]
 
@@ -50,8 +51,8 @@ if __name__ == "__main__":
 	fig.set_size_inches(16,6)
 	fig.savefig('plots/plot_interrupt_{0}.png'.format(ana_exec_time), dpi=100)
 
-	'''
-
+	
+	# Plot with states as x-axis
 	k = df["pid"]
 	req_df = pd.DataFrame(columns=k,index=["Started","Terminated","Done"])
 
@@ -90,5 +91,31 @@ if __name__ == "__main__":
 	fig.set_size_inches(16,6)
 	fig.savefig('plots/plot_unit_status.png', dpi=100)
 
-
+	'''
 	
+	# Plot with units as x-axis
+	k = df["pid"]
+	req_df = pd.DataFrame(index=k,columns=["Started","Terminated","Done"])
+
+	for row in df.sort("pid").iterrows():
+		started = row[1:][0]["Started"]
+		terminated = 0
+		done  = 0
+
+		if row[1:][0]["Terminated"] != "None":
+			terminated = float(row[1:][0]["Terminated"])
+		if row[1:][0]["Done"] != "None":
+			done = float(row[1:][0]["Done"])
+
+		req_df.loc["{0}".format(row[1:][0]["pid"])] = [started,terminated,done]
+
+	#print req_df
+
+
+	ax = req_df.plot(kind='bar', ylim = (min(req_df["Started"])-100, max(req_df["Done"])+100),rot=0)
+	ax.set_xlabel("Units")
+	ax.set_ylabel("Time (seconds)")
+
+	fig = plt.gcf()
+	fig.set_size_inches(16,6)
+	fig.savefig('plots/plot_unit_status.png', dpi=100)
