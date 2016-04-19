@@ -7,11 +7,13 @@ if __name__ == "__main__":
 	sim_arg = 50
 	ana_exec_time = 10
 	ana_tot_duration = 50
+	max_interrupt_tasks = 3
 
 	# Read given CSV
-	df = pd.read_csv('execution_profile_nsims_{0}_simdur_{1}_anaexec_{2}_anatotdur_{3}.csv'.format(nsims,sim_arg,
+	df = pd.read_csv('execution_profile_nsims_{0}_simdur_{1}_anaexec_{2}_anatotdur_{3}_max_{4}.csv'.format(nsims,sim_arg,
 		ana_exec_time,
-		ana_tot_duration),
+		ana_tot_duration,
+		max_interrupt_tasks),
 		header=4,sep=',',skipinitialspace=True)
 
 	df = df.sort("Interrupt")
@@ -44,11 +46,11 @@ if __name__ == "__main__":
 	req_df.loc["{0}".format(sim_arg)] = [0,terminated,nsims-terminated]	
 
 	#print req_df
-	ax = req_df.plot(kind='bar',stacked=False,ylim=(0,nsims+2))
+	ax = req_df.plot(kind='bar',stacked=False,ylim=(0,nsims+2), title = "Number of interrupted tasks = (1,{0})".format(max_interrupt_tasks))
 	ax.set_xlabel("Time (seconds)")
 	ax.set_ylabel("Number of tasks")
 
 	fig = plt.gcf()
 	fig.set_size_inches(16,6)
-	fig.savefig('plots/plot_interrupt_max_3.png'.format(ana_exec_time), dpi=100)
+	fig.savefig('plots/plot_interrupt_max_{0}.png'.format(max_interrupt_tasks), dpi=100)
 	

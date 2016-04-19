@@ -5,7 +5,7 @@ if __name__ == "__main__":
 
 	nsims = 10
 	sim_arg = 50
-	ana_exec_time = 5
+	ana_exec_time = 10
 	ana_tot_duration = 50
 
 	# Read given CSV
@@ -15,7 +15,7 @@ if __name__ == "__main__":
 		header=4,sep=',',skipinitialspace=True)
 
 	df = df.sort("Interrupt")
-	print df
+	#print df
 	#print df[df.Interrupt<="20"].count()
 
 	# Construct required DF
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 		#print t
 		#terminated = len(df[df.Interrupt<="{0}".format(t)])
 		terminated += len(df[df.Interrupt==str(t)])
-		print "Terminated: ",terminated
+		#print "Terminated: ",terminated
 
 		# Count restarted processes
 		terminated_time_this =  float(df[df.Interrupt==str(t)]["Terminated"])
@@ -44,7 +44,7 @@ if __name__ == "__main__":
 		else:
 			restarted = df[(df.Started > terminated_time_this) ]
 		restarted_cnt += len(restarted)
-		print "restarted: ",restarted_cnt
+		#print "restarted: ",restarted_cnt
 		executing = nsims - terminated + restarted_cnt
 		#print executing
 		req_df.loc["{0}".format(t)] = [executing, terminated,0]
@@ -54,8 +54,11 @@ if __name__ == "__main__":
 
 	req_df.loc["{0}".format(sim_arg)] = [restarted_cnt,terminated,nsims-terminated]	
 
+	print terminated_time_this
+	print df[df.Started > terminated_time_this]
+
 	#print req_df
-	ax = req_df.plot(kind='bar',stacked=False,ylim=(0,nsims+2))
+	ax = req_df.plot(kind='bar',stacked=False,ylim=(0,nsims+2), title="Cancel and restart every {0} seconds".format(ana_exec_time))
 	ax.set_xlabel("Time (seconds)")
 	ax.set_ylabel("Number of tasks")
 

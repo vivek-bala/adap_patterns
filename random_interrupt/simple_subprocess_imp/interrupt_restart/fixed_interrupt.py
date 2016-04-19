@@ -8,7 +8,7 @@ sim_kernel = "/bin/sleep"
 tot_sim_tasks = 10
 sim_arg = 50
 
-interrupt_time_period = 5
+interrupt_time_period = 10
 interrupt_total_duration = 50
 
 if __name__ == '__main__':

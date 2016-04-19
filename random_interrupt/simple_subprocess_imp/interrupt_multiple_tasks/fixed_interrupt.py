@@ -87,10 +87,11 @@ if __name__ == '__main__':
 
 	title = "pid, Interrupt, Started, Terminated, Done"
 
-	f1 = open("execution_profile_nsims_{0}_simdur_{3}_anaexec_{1}_anatotdur_{2}.csv".format(tot_sim_tasks,
+	f1 = open("execution_profile_nsims_{0}_simdur_{3}_anaexec_{1}_anatotdur_{2}_max_{4}.csv".format(tot_sim_tasks,
 		interrupt_time_period,
 		interrupt_total_duration,
-		sim_arg),
+		sim_arg,
+		interrupt_max_tasks),
 	'w')
 
 	f1.write("total no. of sims = {0} \n".format(tot_sim_tasks))
