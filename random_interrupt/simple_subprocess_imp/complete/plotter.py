@@ -23,55 +23,44 @@ if __name__ == "__main__":
 		interrupt_max_tasks),
 		header=7,sep=',',skipinitialspace=True)
 
-	df = df.sort("Interrupt")
-	#print df
-	#print df[df.Interrupt<="20"].count()
+	for i in range(len(df)):
+		if df["Interrupt"][i] != "None":
+			df["Interrupt"][i] = int(df["Interrupt"][i])
 
-	# Construct required DF
+	#print df.sort("Interrupt")	
 
-	req_df = pd.DataFrame(columns=["Executing","Terminated","Done"])
-	req_df.loc["0"] = [nsims,0,0]
 
-	#print df[df.Interrupt < 2]
-	#print df[df.Interrupt<="2"]
+	# Plot with units as x-axis
+	k = df["pid"]
+	req_df = pd.DataFrame(columns=["Started","Terminated","Done"])
 
-	terminated=0
-	restarted_cnt = 0
-	#print df[:1][" Started"]
-	
-	for row in df.iterrows():
-		#print t
-		#terminated = len(df[df.Interrupt<="{0}".format(t)])
-		terminated += len(df[df.Interrupt==str(t)])
-		#print "Terminated: ",terminated
+	for row in df.sort("pid").iterrows():
+		started = row[1:][0]["Started"]
+		terminated = 0
+		done  = 0
 
-		# Count restarted processes
-		terminated_time_this =  float(df[df.Interrupt==str(t)]["Terminated"])
-		if int(t) < int(ana_tot_duration - ana_exec_time):
-			terminated_time_next =  float(df[df.Interrupt==str(t+ana_exec_time)]["Terminated"])
-			restarted = df[(df.Started > terminated_time_this) & (df.Started < terminated_time_next)]
+		if row[1:][0]["Terminated"] != "None":
+			terminated = float(row[1:][0]["Terminated"])
 		else:
-			restarted = df[(df.Started > terminated_time_this) ]
-		restarted_cnt += len(restarted)
-		#print "restarted: ",restarted_cnt
-		executing = nsims - terminated + restarted_cnt
-		#print executing
-		req_df.loc["{0}".format(t)] = [executing, terminated,0]
-		if terminated == nsims:
-			break
-		#iter+=1
+			terminated = None
+		if row[1:][0]["Done"] != "None":
+			done = float(row[1:][0]["Done"])
+		else:
+			done = None
 
-	req_df.loc["{0}".format(sim_arg)] = [restarted_cnt,terminated,nsims-terminated]	
+		req_df.loc["{0}".format(row[1:][0]["pid"])] = [started,terminated,done]
 
-	print terminated_time_this
-	print df[df.Started > terminated_time_this]
+	print req_df
+	maxx = 0
+	for k in df["Done"]:
+		if k != "None":
+			if maxx < float(k):
+				maxx = float(k)
 
-	#print req_df
-	ax = req_df.plot(kind='bar',stacked=False,ylim=(0,nsims+2), title="Cancel and restart every {0} seconds".format(ana_exec_time))
-	ax.set_xlabel("Time (seconds)")
-	ax.set_ylabel("Number of tasks")
+	ax = req_df.plot(kind='bar', ylim = (min(req_df["Started"])-100, maxx+100),rot=0)
+	ax.set_xlabel("Tasks")
+	ax.set_ylabel("Time (seconds)")
 
 	fig = plt.gcf()
 	fig.set_size_inches(16,6)
-	fig.savefig('plots/plot_interrupt_{0}.png'.format(ana_exec_time), dpi=100)
-	
+	fig.savefig('plot_unit_status.png', dpi=100)

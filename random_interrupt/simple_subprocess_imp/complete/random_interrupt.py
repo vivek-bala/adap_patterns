@@ -13,8 +13,8 @@ interrupt_total_duration = 50
 interrupt_min_tasks = 1
 interrupt_max_tasks = 3
 
-interrupt_min_time = 5
-interrupt_max_time = 10
+interrupt_gap_min = 5
+interrupt_gap_max = 10
 
 if __name__ == '__main__':
 
@@ -46,10 +46,10 @@ if __name__ == '__main__':
 	interrupt_time_cnt = 0
 
 	# Interrupt till all processes haven't finished AND total time is less than max exec time
-	while( (len(proc_list) is not 0) and (interrupt_time_cnt<=interrupt_total_duration)):
+	while( (len(proc_list) is not 0) and (interrupt_time_cnt<(interrupt_total_duration - interrupt_gap_max))):
 
 		# Sleep for a random time
-		interrupt_time=randint(interrupt_min_time,interrupt_max_time)
+		interrupt_time = randint (interrupt_gap_min,interrupt_gap_max)
 		time.sleep(interrupt_time)
 		interrupt_time_cnt += interrupt_time
 
@@ -101,17 +101,17 @@ if __name__ == '__main__':
 	title = "pid, Interrupt, Started, Terminated, Done"
 
 	f1 = open("execution_profile_nsims_{0}_simdur_{3}_anamin_{1}_anamax{5}_anatotdur_{2}_max_{4}.csv".format(tot_sim_tasks,
-		interrupt_min_time,
+		interrupt_gap_min,
 		interrupt_total_duration,
 		sim_arg,
 		interrupt_max_tasks,
-		interrupt_max_time),
+		interrupt_gap_max),
 	'w')
 
 	f1.write("total no. of sims = {0} \n".format(tot_sim_tasks))
 	f1.write("sim duration = {0} \n".format(sim_arg))
-	f1.write("interrupt min time = {0} \n".format(interrupt_min_time))
-	f1.write("interrupt max time = {0} \n".format(interrupt_max_time))
+	f1.write("interrupt min time = {0} \n".format(interrupt_gap_min))
+	f1.write("interrupt max time = {0} \n".format(interrupt_gap_max))
 	f1.write("interrupt min tasks = {0} \n".format(interrupt_min_tasks))
 	f1.write("interrupt max tasks = {0} \n".format(interrupt_max_tasks))
 	f1.write("interrupt_total_duration = {0} \n".format(interrupt_total_duration))
