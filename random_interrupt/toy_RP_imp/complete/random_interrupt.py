@@ -7,13 +7,16 @@ import math
 import pprint
 
 sim_kernel = "/bin/sleep"
-tot_sim_tasks = 12
+tot_sim_tasks = 10
 sim_arg = 50
 
-interrupt_time_period = 10
 interrupt_total_duration = 50
 
-unit_info = dict()
+interrupt_min_tasks = 1
+interrupt_max_tasks = 3
+
+interrupt_gap_min = 5
+interrupt_gap_max = 10
 
 def pilot_state_cb (pilot, state) :
 	print "Resource state has changed to {0}".format(state)
@@ -37,16 +40,6 @@ def unit_state_cb (unit, state) :
 		raise "ComputeUnit error: STDERR: {0}, STDOUT: {0}"
 		sys.exit(1)
 
-	if state == rp.EXECUTING:
-		unit_info[unit.uid] = dict()
-		unit_info[unit.uid]['Started'] = time.time()
-
-	if state == rp.DONE:
-		unit_info[unit.uid]['Done'] = time.time()
-
-	if state == rp.CANCELED:
-		unit_info[unit.uid]['Terminated'] = time.time()
-		print "Terminated unit: {0}".format(unit.uid)
 
 if __name__ == "__main__":
 
@@ -55,7 +48,6 @@ if __name__ == "__main__":
 
 	# Sanity check
 	assert interrupt_total_duration <= sim_arg
-	assert interrupt_time_period <= interrupt_total_duration
 
 
 	# Start RP related processes
@@ -78,7 +70,7 @@ if __name__ == "__main__":
 	# Creating a Pilot + Submitting
 	pdesc = rp.ComputePilotDescription()
 	pdesc.resource = "localhost"
-	pdesc.runtime  = 10
+	pdesc.runtime  = 20
 	pdesc.cores    = 4
 
 	#pdesc.queue = self._queue
@@ -111,7 +103,7 @@ if __name__ == "__main__":
 	while( (len(units) is not 0) and (interrupt_time_cnt<=int(math.ceil(tot_sim_tasks/pilot.description["cores"]))*interrupt_total_duration - 1)):
 
 		# Sleep for a random time
-		interrupt_time= interrupt_time_period
+		interrupt_time= randint(interrupt_gap_min,interrupt_gap_max)
 		time.sleep(interrupt_time)
 		interrupt_time_cnt += interrupt_time
 
@@ -126,8 +118,6 @@ if __name__ == "__main__":
 
 			if candidate_unit.state == "Executing":
 				candidate_unit.cancel()
-				#unit_info[candidate_unit.uid]["Terminated"] = time.time()
-				unit_info[candidate_unit.uid]["Interrupt"] = interrupt_time_cnt
 				units.remove(candidate_unit)
 
 		# Remove units already completed
@@ -142,37 +132,6 @@ if __name__ == "__main__":
 
 	session.close(cleanup=False)
 
-	# Pretty print
-	pprint.pprint(unit_info)
-
-	# Write proc info record to file
-
-	title = "pid, Interrupt, Started, Terminated, Done"
-
-	f1 = open("execution_profile_nsims_{0}_simdur_{3}_anaexec_{1}_anatotdur_{2}.csv".format(tot_sim_tasks,
-		interrupt_time_period,
-		interrupt_total_duration,
-		sim_arg),
-	'w')
-
-	f1.write("total no. of sims = {0} \n".format(tot_sim_tasks))
-	f1.write("sim duration = {0} \n".format(sim_arg))
-	f1.write("interrupt time period= {0} \n".format(interrupt_time_period))
-	f1.write("interrupt_total_duration = {0} \n".format(interrupt_total_duration))
-
-	f1.write("\n"+ title + "\n\n")
-
-	for pid, vals in unit_info.iteritems():
-
-		if "Terminated" in vals.keys():
-			line = "{0}, {1}, {2:0.5f}, {3:0.5f}, None\n".format(pid, vals["Interrupt"], vals["Started"],vals["Terminated"])
-			f1.write(line)
-
-		elif "Done" in vals.keys():
-			line = "{0}, None, {1:0.5f}, None, {2:0.5f}\n".format(pid, vals["Started"],vals["Done"])
-			f1.write(line)
-
-	f1.close()
 
 
 	import radical.pilot.utils as rpu
@@ -191,4 +150,24 @@ if __name__ == "__main__":
 	rpu.add_frequency(adv, 'f_exe', 0.5, {'state' : 'Executing', 'event' : 'advance'})
 
 	s_frame, p_frame, u_frame = rpu.get_session_frames(sid)
-	print str(u_frame)
+	#print str(u_frame)
+
+	info = ["uid",	"Unscheduled", 
+			"StagingInput", 
+			"AgentStagingInputPending",
+			"AgentStagingInput",
+			"AllocatingPending",
+			"Allocating",
+			"ExecutingPending",
+			"Executing",
+			"AgentStagingOutputPending",
+			"AgentStagingOutput",
+			"StagingOutput",
+			"Canceled",
+			"Done"]
+	u_frame.to_csv("execution_profile_nsims_{0}_simdur_{3}_anamin_{1}_anamax{5}_anatotdur_{2}_max_{4}.csv".format(tot_sim_tasks,
+		interrupt_gap_min,
+		interrupt_total_duration,
+		sim_arg,
+		interrupt_max_tasks,
+		interrupt_gap_max), sep=',', columns = info, header = info)
