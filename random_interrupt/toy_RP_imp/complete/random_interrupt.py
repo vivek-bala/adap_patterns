@@ -15,8 +15,10 @@ interrupt_total_duration = 50
 interrupt_min_tasks = 1
 interrupt_max_tasks = 3
 
-interrupt_gap_min = 5
-interrupt_gap_max = 10
+interrupt_gap_min = 10
+interrupt_gap_max = 15
+
+os.environ['RADICAL_PILOT_PROFILE'] = "True"
 
 def pilot_state_cb (pilot, state) :
 	print "Resource state has changed to {0}".format(state)
