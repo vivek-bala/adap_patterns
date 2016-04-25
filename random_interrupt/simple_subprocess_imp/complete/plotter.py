@@ -11,8 +11,8 @@ if __name__ == "__main__":
 	interrupt_min_tasks = 1
 	interrupt_max_tasks = 3
 
-	interrupt_min_time = 5
-	interrupt_max_time = 10
+	interrupt_min_time = 10
+	interrupt_max_time = 15
 
 	# Read given CSV
 	df = pd.read_csv('execution_profile_nsims_{0}_simdur_{1}_anamin_{2}_anamax{3}_anatotdur_{4}_max_{5}.csv'.format(nsims,
@@ -63,4 +63,4 @@ if __name__ == "__main__":
 
 	fig = plt.gcf()
 	fig.set_size_inches(16,6)
-	fig.savefig('plot_unit_status.png', dpi=100)
+	fig.savefig('plots/plot_unit_status_anamin_{0}_anamax_{1}.png'.format(interrupt_min_time,interrupt_max_time), dpi=100)
