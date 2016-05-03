@@ -26,21 +26,17 @@ if __name__ == "__main__":
 	#print df
 
 	req_df = df[["uid","Executing","Canceled","Done"]].sort("Executing")
+	print req_df
+
+	req_df = req_df.T.drop("uid")
 	#print req_df
+	
 
-	maxx = 0
-	for k in df["Done"]:
-		if k != "None":
-			if maxx < float(k):
-				maxx = float(k)
-	#print maxx
-
-	ax = req_df.plot(kind='bar', #ylim = (min(req_df["Executing"])-100, maxx+100),
-		rot=0)
-	ax.set_xlabel("Tasks")
-	ax.set_ylabel("Time (seconds)")
+	ax = req_df.plot(kind='barh',color=["red","blue","green"])
+	ax.set_ylabel("Tasks")
+	ax.set_xlabel("Time (seconds)")
 
 	fig = plt.gcf()
 	fig.set_size_inches(16,6)
-	fig.savefig('plots/plot_unit_status_anamin_{0}_anamax_{1}.png'.format(interrupt_min_time,interrupt_max_time), dpi=100)
+	fig.savefig('plot_test.png'.format(interrupt_min_time,interrupt_max_time), dpi=100)
 	
